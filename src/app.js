@@ -20,7 +20,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 import healthCheckrouter from './routes/healthCheckrouter.js';
-app.use('api/v1/health', healthCheckrouter);
+app.use('/api/v1/healthcheck/', healthCheckrouter);
 app.get('/', (req, res) => {
     res.status(200).json({Message:"Code is live"}).send('OK');
 });
