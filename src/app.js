@@ -14,7 +14,7 @@ app.use(express.static('public'));
  
 //cors configuration
 app.use(cors({
-    origin: process.env.origin?.split(",") || "http://localhost:3000",
+    origin: process.env.ORIGIN || "http://localhost:3000",
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
