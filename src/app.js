@@ -19,10 +19,8 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-//health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).send('OK');
-});
+import healthCheckrouter from './routes/healthCheckrouter.js';
+app.use('api/v1/health', healthCheckrouter);
 app.get('/', (req, res) => {
     res.status(200).json({Message:"Code is live"}).send('OK');
 });
