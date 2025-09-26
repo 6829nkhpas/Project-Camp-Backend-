@@ -1,3 +1,32 @@
+import Mailgen from "mailgen";
+import nodemailer from "nodemailer";
+
+// sending email using nodemailer and mailgen
+const emailsend = async (options) => {
+    // create a transporter
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+        },
+    });
+
+    // configure mailgen
+    const mailGenerator = new Mailgen({
+        theme: 'default',
+        product: {
+            name: 'Camp',
+            link: process.env.CLIENT_URL || 'http://localhost:3000/',
+            // Optional product logo
+            // logo: 'https://example.com/logo.png' 
+        }
+    });
+
+    // generate email body
+    const emailBody = mailGenerator.generate(options);
+
 const emailVerificationTemplate = (username, verificationUrl) => {
     return{
         body:{
