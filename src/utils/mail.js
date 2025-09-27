@@ -1,32 +1,41 @@
 import Mailgen from "mailgen";
 import nodemailer from "nodemailer";
 
-// sending email using nodemailer and mailgen
-const emailsend = async (options) => {
-    // create a transporter
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASSWORD,
-        },
-    });
-
-    // configure mailgen
-    const mailGenerator = new Mailgen({
+const sendemail = async (options) => {
+    const mailGenerator = new Mailgen({ 
         theme: 'default',
         product: {
             name: 'Camp',
-            link: process.env.CLIENT_URL || 'http://localhost:3000/',
-            // Optional product logo
-            // logo: 'https://example.com/logo.png' 
+            link: 'https://camp.com/'
         }
     });
+    const emailTextualContent = mailGenerator.generatePlaintext(options.mailgenContent);
+    const emailHTMLContent = mailGenerator.generate(options.mailgenContent);
+    const transporter = nodemailer.createTransport({
+        host: process.env.MAILTRAP_SMTP_HOST,
+        port: process.env.MAILTRAP_SMTP_PORT,
+        auth: {
+            user: process.env.MAILTRAP_USER,
+            pass: process.env.MAILTRAP_PASS
+        }
+    });
+    const mailOptions = {
+        from: '"chianshift@gmail.com"',
+        to: options.email,
+        subject: options.subject,
+        text: emailTextualContent,
+        html: emailHTMLContent
+    };
+    try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error(
+      "Email service failed siliently. Make sure that you have provided your MAILTRAP credentials in the .env file",
+    );
+    console.error("Error: ", error);
+  }
 
-    // generate email body
-    const emailBody = mailGenerator.generate(options);
-
+};
 const emailVerificationTemplate = (username, verificationUrl) => {
     return{
         body:{
