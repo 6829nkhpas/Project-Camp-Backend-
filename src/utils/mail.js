@@ -53,7 +53,7 @@ const emailVerificationTemplate = (username, verificationUrl) => {
         }
     }
 };
-constforgotPasswordTemplate = (username, resetUrl) => {
+const forgotPasswordTemplate = (username, resetUrl) => {
     return{
         body:{
             name: username,
