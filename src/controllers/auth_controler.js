@@ -56,3 +56,4 @@ const register = asynchandler(async (req,res)=>{
         )
      )
 });
+export {register};
