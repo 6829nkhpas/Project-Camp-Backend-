@@ -1,10 +1,58 @@
-import user from '../models/user.js';
+import {User} from '../models/user.js';
+import {Apiresponse} from '../utils/Apirespose.js';
+import {Apierror} from '../utils/ErrorRespose.js';
+import {asynchandler} from '../middlewares/asyncHandler.js';
 import jwt from 'jsonwebtoken';
-import asynchandler from '../utils/asynchandler.js';
-import Apiresponse from '../utils/Apirespose.js';
-import { sendEmail, emailVerificationTemplate, forgotPasswordTemplate } from '../utils/mail.js';
-import crypto from 'crypto';
+import {sendEmail, emailVerificationTemplate, forgotPasswordTemplate, emailVerificationMailgenContent} from '../utils/mail.js';
+const generateTokens = async (userId) =>{
+    try {
+        
+    } catch (error) {
+        
+    }
+}
 
-// Register a new user
-export const register = asynchandler(async (req, res) => {
-    const { username, email, password } = req.body;
+const register = asynchandler(async (req,res)=>{
+    const {email,username,password,role} = req.body;
+    const userdata=await User.findOne({
+        $or:[{email},{username}]
+    });
+    if(userdata){
+        throw new Apierror(409,"username or email already have an account");
+    }
+    const user =await User.create({
+        email,
+        password,
+        username,
+        isEmailVerified: false,
+    })
+    const {unHashedToken, hashedToken, tokenExpiry} =user.generateTemporaryToken();
+    user.emailverificationToken = hashedToken;
+    user.emailVerificationExpiry = tokenExpiry;
+    await user.save({validateBeforeSave:false });
+    await sendEmail({
+        email:user?.email,
+        subject: "Please Verify your email",
+        mailgenContent: emailVerificationMailgenContent(
+            user.username,
+            `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
+
+        )
+    });
+    const createdUser =await User.findById(user._id).select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry")
+
+    if(!createdUser){
+        throw new Apierror(500, "something went Wrong while regestering the user please try again");
+    }
+     return res
+     .status(201)
+     .json(
+        new Apiresponse(
+            200,
+            {
+                user:createdUser
+            },
+            `User Registered Successfully and Verification Email has been sent you ${email}`,
+        )
+     )
+});
