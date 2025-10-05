@@ -20,3 +20,4 @@ const verifyToken = asynchandler(async (req,res,next)=>{
         throw new Apierror(401,"Not authorized to access this route, please login");
     }
 });
+export {verifyToken};

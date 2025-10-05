@@ -12,7 +12,7 @@ const generateTokens = async (userId) =>{
     }
 }
 
-const register = asynchandler(async (req,res)=>{
+const registerUser = asynchandler(async (req,res)=>{
     const {email,username,password,role} = req.body;
     const userdata=await User.findOne({
         $or:[{email},{username}]
@@ -56,4 +56,4 @@ const register = asynchandler(async (req,res)=>{
         )
      )
 });
-export {register};
+export {registerUser};
