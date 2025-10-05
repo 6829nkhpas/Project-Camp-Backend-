@@ -104,4 +104,4 @@ const login= asynchandler(async (req,res)=>{
         ),
     );
 });
-export {registerUser};
+export {registerUser, login};
