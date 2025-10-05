@@ -6,9 +6,19 @@ import jwt from 'jsonwebtoken';
 import {sendEmail, emailVerificationTemplate, forgotPasswordTemplate, emailVerificationMailgenContent} from '../utils/mail.js';
 const generateTokens = async (userId) =>{
     try {
+         const user = await User.findById(userId);
+         if(!user){
+            throw new Apierror(404, "User not found");
+         }
+         const accessToken =  user.generateaccessToken();
+         const refreshToken = user.generateRefreshToken();
+         await user.save({validateBeforeSave:false});
+         return {accessToken, refreshToken};
+         //
+         user.refreshToken = user.generateRefreshToken();
         
     } catch (error) {
-        
+        throw new Apierror(500, "Internal Server Error");
     }
 }
 
