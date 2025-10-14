@@ -181,6 +181,39 @@ const verifyEmail = asyncHandler(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, {}, `Email has been Resent to ${user.email}`));
 });
+const refreshAccessToken = asynchandler(async (req, res) => { 
+    const {refreshToken} = req.cookies.refreshToken || req.body.refreshToken;
+    if(!refreshToken){
+        throw new Apierror(400, "Refresh Token is missing Unauthorized");
+    }
+   try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    if(!decoded){
+        throw new Apierror(401, "Invalid Refresh Token");
+    }
+    const user = await User.findById(decoded._id);
+    if(!user){
+        throw new Apierror(404, "User not found");
+    }
+    if(user.refreshToken !== refreshToken){
+        throw new Apierror(401, "Expired Refresh Token");
+    }
+    const {accessToken, refreshToken: newRefreshToken} = await generateTokens(user._id);
+    user.refreshToken = newRefreshToken;
+    await user.save({validateBeforeSave:false});
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", newRefreshToken, options)
+    .json(new Apiresponse(200, {user, accessToken, refreshToken: newRefreshToken}, "Access Token refreshed successfully"));
+   } catch (error) {
+    
+    throw new Apierror(401, "Invalid Refresh Token");
+   }
+    });
 
-
-export {registerUser, login, logoutUser, getCurrentUser, verifyEmail, resendEmailVerification};
+export {registerUser, login, logoutUser, getCurrentUser, verifyEmail, resendEmailVerification, refreshAccessToken};
