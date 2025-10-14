@@ -1,4 +1,4 @@
-import { registerUser,login,logoutUser,getCurrentUser } from "../controllers/auth_controler";
+import { registerUser,login,logoutUser,getCurrentUser,verifyEmail } from "../controllers/auth_controler";
 import express from "express";
 const router = express.Router();
 import {validate} from '../middlewares/validateRequest.js';
@@ -17,3 +17,4 @@ router.post("/register",userRegisterValidator(),validate,registerUser);
 router.post("/login",userLoginValidator(),validate,login);
 router.post("/logout",VerifyToken,logoutUser);
 router.get("/me",VerifyToken,getCurrentUser);
+router.get("/verify-email/:verifyToken",verifyEmail);
