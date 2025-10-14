@@ -18,3 +18,5 @@ router.post("/login",userLoginValidator(),validate,login);
 router.post("/logout",VerifyToken,logoutUser);
 router.get("/me",VerifyToken,getCurrentUser);
 router.get("/verify-email/:verifyToken",verifyEmail);
+
+export default router;
