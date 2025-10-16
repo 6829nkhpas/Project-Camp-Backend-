@@ -284,4 +284,4 @@ const changePassword = asynchandler(async (req, res) => {
 
 });
 
-export {registerUser, login, logoutUser,changePassword, getCurrentUser, verifyEmail, resendEmailVerification, refreshAccessToken, forgotPaswordRequest};
+export {registerUser, login, logoutUser,changePassword, getCurrentUser,resetForgotPassword, verifyEmail, resendEmailVerification, refreshAccessToken, forgotPaswordRequest};
