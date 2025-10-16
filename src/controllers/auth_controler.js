@@ -215,5 +215,29 @@ const refreshAccessToken = asynchandler(async (req, res) => {
     throw new Apierror(401, "Invalid Refresh Token");
    }
     });
+const forgotPaswordRequest = asynchandler(async (req, res) => { 
+    const {email} = req.body;
+    const user = await User.findOne({email});
+    if(!user){
+        throw new Apierror(404, "User not found");
+    }
+    const {unHashedToken, hashedToken, tokenExpiry} =user.generateTemporaryToken();
+    user.forgotPasswordToken = hashedToken;
+    user.forgotPasswordExpiry = tokenExpiry;
+    await user.save({validateBeforeSave:false });
+    await sendEmail({
+        email:user?.email,
+        subject: "Password Reset Request",
+        mailgenContent: forgotPasswordTemplate(
+            user.username,
+            `${req.protocol}://${req.get("host")}/api/v1/users/reset-password/${unHashedToken}`,
+            10
+        )
+    });
+    return res
+    .status(200)
+    .json(new Apiresponse(200, {}, `Password reset email has been sent to ${user.email}`));
+});
 
-export {registerUser, login, logoutUser, getCurrentUser, verifyEmail, resendEmailVerification, refreshAccessToken};
+
+export {registerUser, login, logoutUser, getCurrentUser, verifyEmail, resendEmailVerification, refreshAccessToken, forgotPaswordRequest};
