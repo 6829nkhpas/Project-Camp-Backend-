@@ -263,5 +263,25 @@ const resetForgotPassword = asynchandler(async (req, res) => {
     .json(new Apiresponse(200, {}, "Password Reset Successfully"));
 });
 
+const changePassword = asynchandler(async (req, res) => {
+    const {currentPassword, newPassword} = req.body;
+    if(!currentPassword || !newPassword){
+        throw new Apierror(400, "Current and New Password are required");
+    }
+    const user = await User.findById(req.user._id);
+    if(!user){
+        throw new Apierror(404, "User not found");
+    }
+    const isPasswordCorrect = await user.isPasswordCorrect(currentPassword);
+    if(!isPasswordCorrect){
+        throw new Apierror(401, "Invalid Current Password");
+    }
+    user.password = newPassword;
+    await user.save({validateBeforeSave:true});
+    return res
+    .status(200)
+    .json(new Apiresponse(200, {}, "Password Changed Successfully"));
 
-export {registerUser, login, logoutUser, getCurrentUser, verifyEmail, resendEmailVerification, refreshAccessToken, forgotPaswordRequest};
+});
+
+export {registerUser, login, logoutUser,changePassword, getCurrentUser, verifyEmail, resendEmailVerification, refreshAccessToken, forgotPaswordRequest};
